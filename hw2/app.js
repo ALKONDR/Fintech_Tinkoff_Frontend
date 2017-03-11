@@ -63,6 +63,8 @@ const bind = (callee, context) => (() => callee.apply(context, arguments));
 console.log(user.greet());
 const greet = bind(user.greet, user);
 console.log(greet());
+// Hello, Vasya
+// Hello, Vasya
 
 // 2.5 task
 
