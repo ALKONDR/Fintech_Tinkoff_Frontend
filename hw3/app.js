@@ -7,6 +7,10 @@ var itemElementList = listElement.children;
 var templateElement = document.getElementById('todoTemplate');
 var templateContainer = 'content' in templateElement ? templateElement.content : templateElement;
 
+var showAllTodosButton = getFilterWithAttribute('all');
+var showDoneTodosButton = getFilterWithAttribute('done');
+var showUndoneTodosButton = getFilterWithAttribute('todo');
+
 // сформируем задачки
 var todoList = [
     {
@@ -50,11 +54,25 @@ function onListClick(event) {
 
     if (isStatusBtn(target)) {
         element = target.parentNode;
-        changeTodoStatus(element);
+        let todoName = element.children[1].textContent;
+        changeTodoStatusByName(todoName, !element.classList.contains('task_todo'));
+        updateDoneAndUndoneLists();
+        if (getFilterWithAttribute('all').classList.contains('filters__item_selected'))
+            changeTodoStatus(element);
+        else {
+            deleteTodo(element);
+            if (getFilterWithAttribute('done').classList.contains('filters__item_selected'))
+                changeStats(+1, -1, 0);
+            else
+                changeStats(+1, +1, 0);
+        }
     }
 
     if (isDeleteBtn(target)) {
         element = target.parentNode;
+        let todoName = element.children[1].textContent;
+        removeTodoByName(todoName);
+        updateDoneAndUndoneLists();
         deleteTodo(element);
     }
 }
@@ -102,7 +120,10 @@ function onInputKeydown(event) {
     }
 
     var todo = createNewTodo(todoName);
-    insertTodoElement(addTodoFromTemplate(todo));
+    todoList.push(todo);
+    updateDoneAndUndoneLists();
+    loadAllTodosTable();
+    // insertTodoElement(addTodoFromTemplate(todo));
     inputElement.value = '';
     changeStats(+1, 0, +1);
 }
@@ -122,6 +143,26 @@ function createNewTodo(name) {
     }
 }
 
+function removeTodoByName(todoName) {
+    todoList.forEach(element => {
+        if (element.name === todoName) {
+            todoList.splice(todoList.indexOf(element), 1);
+            return;
+        }
+    });
+}
+
+function changeTodoStatusByName(todoName, changeStatusOnToDo) {
+    todoList.forEach(element => {
+        if (element.name === todoName){
+            if (changeStatusOnToDo && !(element.status === 'todo'))
+                element.status = 'todo';
+            else
+                element.status = 'done';
+        }
+    });
+}
+
 function changeGivenStat(statisticElement, increaseValue) {
     let newValue = parseInt(statisticElement.textContent) + increaseValue;
     statisticElement.textContent = String(newValue);
@@ -137,21 +178,73 @@ function changeStats(increaseAllTodos, increaseDoneTodos, increaseUndoneTodos) {
     changeGivenStat(undoneTodos, increaseUndoneTodos);
 }
 
-doneTodoList = todoList.filter(el => el.status == 'done');
-undoneTodoList = todoList.filter(el => el.status == 'todo');
+function unselectGivenFilter(filter) {
+    if (filter.classList.contains('filters__item_selected'))
+        filter.classList.remove('filters__item_selected');
+}
 
-todoList
-    .map(addTodoFromTemplate)
-    .forEach(insertTodoElement);
+function unselectAllFilters() {
+    let allFilters = document.querySelector('.filters').children;
+    Array.prototype.map.call(allFilters, unselectGivenFilter);
+}
+
+function getFilterWithAttribute(dataFilterValue) {
+    let filters = document.querySelector('.filters').children;
+    let ansFilter;
+    Array.prototype.forEach.call(filters, (element) => {
+        if (element.attributes[0].value === dataFilterValue)
+            ansFilter = element;
+    });
+    return ansFilter;
+}
+
+function clearTodoTable() {
+    document.querySelector('.list').innerHTML = '';
+}
+
+function prepareTableForLoading(dataFilterValue) {
+    clearTodoTable();
+    unselectAllFilters();
+    getFilterWithAttribute(dataFilterValue).classList.add('filters__item_selected');
+}
+
+function loadGivenList(listOfTodosToLoad) {
+    listOfTodosToLoad.map(addTodoFromTemplate).forEach(insertTodoElement);
+}
+
+function loadAllTodosTable() {
+    prepareTableForLoading('all');
+    loadGivenList(todoList);
+}
+
+function loadDoneTodosTable() {
+    prepareTableForLoading('done');
+    loadGivenList(doneTodoList);
+}
+
+function loadUndoneTodosTable() {
+    prepareTableForLoading('todo');
+    loadGivenList(undoneTodoList);
+}
+
+function updateDoneAndUndoneLists(){
+    doneTodoList = todoList.filter(el => el.status === 'done');
+    undoneTodoList = todoList.filter(el => el.status === 'todo');
+}
+
+updateDoneAndUndoneLists();
+
+loadAllTodosTable();
 
 listElement.addEventListener('click', onListClick);
+
+showAllTodosButton.addEventListener('click', loadAllTodosTable);
+showDoneTodosButton.addEventListener('click', loadDoneTodosTable);
+showUndoneTodosButton.addEventListener('click', loadUndoneTodosTable);
 
 var inputElement = document.querySelector('.add-task__input');
 inputElement.addEventListener('keydown', onInputKeydown);
 
-// Задача:
-// исправьте багу с добавлением insertBefore в пустой массив
-// создайте статистику
 function insertTodoElement(elem) {
     listElement.insertBefore(elem, listElement === [] ? null : listElement.firstChild);
 }
