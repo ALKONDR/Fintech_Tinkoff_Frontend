@@ -62,7 +62,7 @@ function onListClick(event) {
         else {
             deleteTodo(element);
             if (getFilterWithAttribute('done').classList.contains('filters__item_selected'))
-                changeStats(+1, -1, 0);
+                changeStats(+1, 0, +1);
             else
                 changeStats(+1, +1, 0);
         }
