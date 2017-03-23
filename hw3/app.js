@@ -27,6 +27,9 @@ var todoList = [
     }
 ];
 
+var doneTodoList = []
+var undoneTodoList = []
+
 // функция по генерации элементов
 function addTodoFromTemplate(todo) {
     var newElement = templateContainer.querySelector('.task').cloneNode(true);
@@ -134,6 +137,9 @@ function changeStats(increaseAllTodos, increaseDoneTodos, increaseUndoneTodos) {
     changeGivenStat(undoneTodos, increaseUndoneTodos);
 }
 
+doneTodoList = todoList.filter(el => el.status == 'done');
+undoneTodoList = todoList.filter(el => el.status == 'todo');
+
 todoList
     .map(addTodoFromTemplate)
     .forEach(insertTodoElement);
@@ -147,9 +153,5 @@ inputElement.addEventListener('keydown', onInputKeydown);
 // исправьте багу с добавлением insertBefore в пустой массив
 // создайте статистику
 function insertTodoElement(elem) {
-    if (listElement.children) {
-        listElement.insertBefore(elem, listElement.firstElementChild);
-    } else {
-        listElement.appendChild(elem);
-    }
+    listElement.insertBefore(elem, listElement === [] ? null : listElement.firstChild);
 }
