@@ -101,11 +101,31 @@ inputElement.addEventListener('keydown', onInputKeydown);
  =            СТАТИСТИКА            =
  ==================================*/
 
-// формируем счетчик статистики
-var stats = {
-    done: 0,
-    todo: 0
-};
+// объявляем класс для статистики
+class Statistic {
+    constructor(done, todo) {
+        this._done = done;
+        this._todo = todo;
+    }
+
+    get done() {
+        return this._done;
+    }
+
+    set done(value) {
+        this._done = value;
+        renderStats();
+    }
+
+    get todo() {
+        return this._todo;
+    }
+
+    set todo(value) {
+        this._todo = value;
+        renderStats();
+    }
+}
 
 // необходимые DOM элементы
 var statsElement = document.querySelector('.statistic');
@@ -134,7 +154,6 @@ function addToStats(isTodo) {
     } else {
         stats.done++;
     }
-    renderStats();
 }
 
 /**
@@ -149,7 +168,6 @@ function changeStats(isTodo) {
         stats.todo--;
         stats.done++;
     }
-    renderStats();
 }
 
 /**
@@ -162,7 +180,6 @@ function deleteFromStats(isTodo) {
     } else {
         stats.done--;
     }
-    renderStats();
 }
 
 // теперь надо переписать старые методы, чтобы учесть статистику
@@ -430,8 +447,5 @@ var tasksDone = todoList.filter(function (item) {
     return item.status === 'done';
 }).length;
 
-stats = {
-    done: tasksDone,
-    todo: todoList.length - tasksDone
-};
+var stats = new Statistic(tasksDone, todoList.length - tasksDone);
 renderStats();
