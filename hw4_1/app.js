@@ -36,10 +36,22 @@ var todoList = [
     }
 ];
 
+function getCurrentDate() {
+    var date = new Date();
+    return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear() % 100}`;
+}
+
+function getCurrentTime() {
+    var date = new Date();
+    return `${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
+}
+
 // функция по генерации элементов
 function addTodoFromTemplate(todo) {
     var newElement = templateContainer.querySelector('.task').cloneNode(true);
     newElement.querySelector('.task__name').textContent = todo.name;
+    newElement.querySelector('.task__date').textContent = getCurrentDate();
+    newElement.querySelector('.task__time').textContent = getCurrentTime();
     setTodoStatusClassName(newElement, todo.status === 'todo');
 
     return newElement;
