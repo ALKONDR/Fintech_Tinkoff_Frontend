@@ -115,6 +115,8 @@ body {
     border-bottom: 1px solid #ededed;
     cursor: pointer;
     position: relative;
+    align-items: center;
+    display: flex;
 }
 
 .task_done {
@@ -136,10 +138,12 @@ body {
 }
 
 .task__name {
-    display: block;
+    display: inline;
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow: hidden;
+    vertical-align: center;
+    margin-left: 10px;
 }
 
 .task__input {
@@ -174,6 +178,11 @@ body {
 
 .task:hover .task__delete-button {
     visibility: visible;
+}
+
+.task__datetime {
+    display: inline-block;
+    font-size: 10px;
 }
 
 /*=====  End of TASK  ======*/
